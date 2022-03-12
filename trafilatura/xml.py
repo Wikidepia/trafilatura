@@ -185,7 +185,7 @@ def replace_element_text(element, include_formatting, include_links):
                 number = int(element.get('rend')[1])
             except (TypeError, ValueError):
                 number = 2
-            element.text = ''.join(['='*number, ' ', element.text, ' ', '='*number])
+            element.text = ''.join(['#'*number, ' ', element.text])
         elif element.tag == 'hi':
             if element.get('rend') == '#b':
                 element.text = ''.join(['**', element.text, '**'])
@@ -250,13 +250,10 @@ def xmltotxt(xmloutput, include_formatting, include_links):
         # process text
         if element.text is None and element.tail is None:
             if element.tag == 'graphic':
+                # add alt, default to ''
+                returnlist.extend([f'![{element.get("alt", "")}]'])
                 # add source, default to ''
-                returnlist.extend(['\n', element.get('src', '')])
-                # proceed with other potential attributes
-                if element.get('alt') is not None:
-                    returnlist.extend([' ', element.get('alt')])
-                if element.get('title') is not None:
-                    returnlist.extend([' ', element.get('title')])
+                returnlist.extend([f'({element.get("src")} "{element.get("title", "")}")'])
             # newlines for textless elements
             if element.tag in ('graphic', 'row', 'table'):
                 returnlist.append('\n')
